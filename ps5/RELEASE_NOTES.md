@@ -33,12 +33,13 @@ entitled to use.
 4. Use FTP to copy the contents of your own Bedlam 2 game-data folder to `/data/Bedlam2PS5/content/`. Create the directory if needed and put the files directly there, not inside another nested `bed2/` folder.
 5. Launch Bedlam 2 from ShadowMountPlus. The app reads game data from `/data/Bedlam2PS5/content/` and stores saves and generated files in `/data/Bedlam2PS5/saves/`.
 
-When updating from RC.1 or RC.2, copy the contents of
+When updating from RC.1, copy the contents of
 `/data/homebrew/PPSA94003/assets/bed2/` to `/data/Bedlam2PS5/content/`, keeping
 the directory structure. Copy existing `MIRAGE/AB_BED/` save files to
 `/data/Bedlam2PS5/saves/MIRAGE/AB_BED/`. Keep the old copies until RC.3 has
 successfully launched and loaded your data. The app can fall back to old save
-files and migrates a save when it is written.
+files and migrates a save when it is written. RC.2 already used the persistent
+paths, so no file migration is needed when updating from RC.2.
 
 ## DualSense controls
 

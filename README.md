@@ -21,12 +21,13 @@ game files in `/data/Bedlam2PS5/content/`; the app creates
 updates replace `/data/homebrew/PPSA94003/` and leave these two data folders in
 place.
 
-When updating from RC.1 or RC.2, copy the contents of
+When updating from RC.1, copy the contents of
 `/data/homebrew/PPSA94003/assets/bed2/` to `/data/Bedlam2PS5/content/`, keeping
 the directory structure. Copy any existing files in `MIRAGE/AB_BED/` to
 `/data/Bedlam2PS5/saves/MIRAGE/AB_BED/`. Keep the old app-folder copy until RC.3
 has launched and loaded your data successfully. The app can fall back to old
-save files and migrates a save when it is written.
+save files and migrates a save when it is written. RC.2 already used the
+persistent paths, so no file migration is needed when updating from RC.2.
 
 ## Features
 
