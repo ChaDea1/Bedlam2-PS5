@@ -63,7 +63,9 @@ In the exit prompt, use the D-pad to choose Yes or No, Cross to confirm, or
 Circle/Options to choose No. Some inputs only act on screens where the related
 game action is available.
 
-## Known behavior
+## Known issues
 
-The first visit to the weapon-selection screen can load more slowly than later
-visits.
+- The game currently crashes when the active robot dies during gameplay. A
+  fix is planned for RC.4.
+- The first visit to the weapon-selection screen can load more slowly than
+  later visits.
