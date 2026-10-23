@@ -52,8 +52,9 @@ acceptance, the app can also be installed through ProsperoStore.
 | R3 (press right stick) | Cycle HUD size: 100%, 150%, 200% |
 | Touchpad click | Pause; click again to resume |
 | Options | Send Escape; during gameplay, open the exit-level confirmation |
-| Cross | Select/click; primary fire during gameplay |
-| Circle / R2 | Secondary mouse button; Circle cancels the exit prompt |
+| Cross | Confirm/select the current option |
+| Circle | Secondary mouse button; cancels the exit prompt |
+| R2 | Primary fire during gameplay |
 
 In the exit prompt, use the D-pad to choose Yes or No, Cross to confirm, or
 Circle/Options to choose No. Some inputs only act on screens where the related
