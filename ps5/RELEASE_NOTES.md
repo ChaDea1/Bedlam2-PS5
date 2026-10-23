@@ -1,18 +1,16 @@
-# Bedlam 2: Absolute Bedlam PS5 v1.0.0-rc.1
+# Bedlam 2: Absolute Bedlam PS5 v1.0.0-rc.2
 
-The first 1.0 release candidate is available for PS5 testing. The app's PS5
-`contentVersion` is `01.000.000`.
+RC.2 adds persistent storage for original game files, saves, and generated
+files. The PS5 app content version remains `01.000.000`.
 
 ## What's included
 
-The release provides:
-
 - `PPSA94003.zip`: the native PS5 application package.
-- `bedlam2-ps5-v1.0.0-rc.1-source.tar.gz`: the source snapshot, without original game data.
+- `bedlam2-ps5-v1.0.0-rc.2-source.tar.gz`: the source snapshot, without original game data.
 - `SHA256SUMS`: SHA-256 checksums for both archives.
 
-Original DOS game data is not included; provide your own files from a copy you
-are legally entitled to use.
+Original DOS game data is not included. Use files from a copy you are legally
+entitled to use.
 
 ## Features
 
@@ -24,19 +22,22 @@ are legally entitled to use.
 - The original game crosshair is enlarged, shadowed, and visible in gameplay and weapon selection.
 - Pause and exit-level notices with a drop shadow, plus an exit confirmation.
 - The active PS5 profile name can fill the game's default player-name field.
+- Game data lives in `/data/Bedlam2PS5/content/`; saves and generated files live in `/data/Bedlam2PS5/saves/`, outside the app folder so app updates preserve them.
 
 ## Manual installation
 
-1. Download `PPSA94003.zip` from the [release page](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.1) and extract it on your computer.
+1. Download `PPSA94003.zip` from the [release page](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.2) and extract it on your computer.
 2. Connect to your PS5 homebrew FTP server and copy the extracted `PPSA94003/` folder to `/data/homebrew/`.
 3. Open [ShadowMountPlus](https://github.com/drakmor/ShadowMountPlus) and register `/data/homebrew/PPSA94003/` as an app folder.
-4. Use FTP to copy the contents of your own Bedlam 2 game-data folder to `/data/homebrew/PPSA94003/assets/bed2/`. Create the directory if needed, and put the files directly there rather than inside another `bed2/` folder.
-5. Launch Bedlam 2 from ShadowMountPlus. The mounted app reads the game data from `/app0/assets/bed2`.
+4. Use FTP to copy the contents of your own Bedlam 2 game-data folder to `/data/Bedlam2PS5/content/`. Create the directory if needed and put the files directly there, not inside another nested `bed2/` folder.
+5. Launch Bedlam 2 from ShadowMountPlus. The app reads game data from `/data/Bedlam2PS5/content/` and stores saves and generated files in `/data/Bedlam2PS5/saves/`.
 
-Use game files from a copy you are legally entitled to use. The repository and
-release package do not provide them. The [README](https://github.com/ChaDea1/Bedlam2-PS5#readme)
-has additional details about the game-data path and controls. After catalog
-acceptance, the app can also be installed through ProsperoStore.
+When updating from RC.1, copy the contents of
+`/data/homebrew/PPSA94003/assets/bed2/` to `/data/Bedlam2PS5/content/`, keeping
+the directory structure. Copy existing `MIRAGE/AB_BED/` save files to
+`/data/Bedlam2PS5/saves/MIRAGE/AB_BED/`. Keep the old copies until RC.2 has
+successfully launched and loaded your data. The app can fall back to old save
+files and migrates a save when it is written.
 
 ## DualSense controls
 

@@ -7,27 +7,26 @@ on the [8street source project](https://github.com/8street/Bedlam2). It runs the
 game's engine with an SDL frontend and DualSense support, rather than through
 DOSBox. This is a fan project and is not an official release.
 
-## Version 1.0.0-rc.1
+## Version 1.0.0-rc.2
 
-The first 1.0 release candidate is available for PS5 testing. The release
-contains the native PS5 app package. Original Bedlam 2 game data is not bundled
-and must be supplied separately.
+The second 1.0 release candidate includes persistent storage for game files,
+saves, and generated files. Original Bedlam 2 game data is not bundled and must
+be supplied separately.
 
-## Persistent data layout in the current test build
+## Persistent data layout
 
-The current native test build keeps user data outside the replaceable app
-folder. Put the original game files in `/data/Bedlam2PS5/content/`; the app
-creates `/data/Bedlam2PS5/saves/` for saves and other generated files. Prospero
-app updates replace `/data/homebrew/PPSA94003/` and leave these two data folders
-in place.
+The app keeps user data outside its replaceable app folder. Put the original
+game files in `/data/Bedlam2PS5/content/`; the app creates
+`/data/Bedlam2PS5/saves/` for saves and other generated files. Prospero app
+updates replace `/data/homebrew/PPSA94003/` and leave these two data folders in
+place.
 
-Before moving from the published RC.1 package to this build, copy the contents
-of `/data/homebrew/PPSA94003/assets/bed2/` to
-`/data/Bedlam2PS5/content/`, keeping the directory structure. Copy any existing
-files in `MIRAGE/AB_BED/` to
-`/data/Bedlam2PS5/saves/MIRAGE/AB_BED/`. Keep the old app-folder copy until the
-new build has launched successfully. The public RC.1 package still uses the
-old app-folder path described below.
+When updating from RC.1, copy the contents of
+`/data/homebrew/PPSA94003/assets/bed2/` to `/data/Bedlam2PS5/content/`, keeping
+the directory structure. Copy any existing files in `MIRAGE/AB_BED/` to
+`/data/Bedlam2PS5/saves/MIRAGE/AB_BED/`. Keep the old app-folder copy until RC.2
+has launched and loaded your data successfully. The app can fall back to old
+save files and migrates a save when it is written.
 
 ## Features
 
@@ -43,7 +42,7 @@ old app-folder path described below.
 
 ## Download
 
-Download the [Bedlam 2 PS5 1.0.0-rc.1 release](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.1).
+Download the [Bedlam 2 PS5 1.0.0-rc.2 release](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.2).
 It includes `PPSA94003.zip`, the PS5 application package, a source archive, and
 `SHA256SUMS` for verifying the downloads. Neither archive includes the original
 DOS game files.
@@ -58,11 +57,11 @@ DOS game files.
 
 ## Manual installation
 
-1. Download `PPSA94003.zip` from the [release page](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.1) and extract it on your computer.
+1. Download `PPSA94003.zip` from the [release page](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.2) and extract it on your computer.
 2. Connect to your PS5 homebrew FTP server and copy the extracted `PPSA94003/` folder to `/data/homebrew/`.
 3. Open ShadowMountPlus and register `/data/homebrew/PPSA94003/` as an app folder.
-4. Use FTP to copy the contents of your own Bedlam 2 game-data folder to `/data/homebrew/PPSA94003/assets/bed2/`. Create the directory if needed. Place the files directly there, not inside another nested `bed2/` folder.
-5. Launch Bedlam 2 from ShadowMountPlus. The mounted app reads game data from `/app0/assets/bed2`.
+4. Use FTP to copy the contents of your own Bedlam 2 game-data folder to `/data/Bedlam2PS5/content/`. Create the directory if needed. Place the files directly there, not inside another nested `bed2/` folder.
+5. Launch Bedlam 2 from ShadowMountPlus. The app reads game data from `/data/Bedlam2PS5/content/` and stores saves and generated files in `/data/Bedlam2PS5/saves/`.
 
 ### Supplying your own game data
 
@@ -75,12 +74,12 @@ entitled to use.
 Copy the contents of that game's data folder directly to:
 
 ```text
-/data/homebrew/PPSA94003/assets/bed2/
+/data/Bedlam2PS5/content/
 ```
 
 The folder should contain entries such as `BEDLAM.EXE`, `GAMEGFX/`, `MIRAGE/`,
-and `SOUND/`, rather than another nested `bed2/` directory. After the app folder
-is mounted, the game reads those files from `/app0/assets/bed2`.
+and `SOUND/`, rather than another nested `bed2/` directory. Saves and other
+generated files are stored separately in `/data/Bedlam2PS5/saves/`.
 
 After acceptance into the Prospero homebrew catalog, the app can also be
 installed through ProsperoStore.
