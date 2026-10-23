@@ -1,12 +1,13 @@
-# Bedlam 2: Absolute Bedlam PS5 v1.0.0-rc.2
+# Bedlam 2: Absolute Bedlam PS5 v1.0.0-rc.3
 
-RC.2 adds persistent storage for original game files, saves, and generated
-files. The PS5 app content version remains `01.000.000`.
+RC.3 includes persistent storage for original game files, saves, and generated
+files. The PS5 app content version is `01.000.001` so consoles recognize it as
+an update.
 
 ## What's included
 
 - `PPSA94003.zip`: the native PS5 application package.
-- `bedlam2-ps5-v1.0.0-rc.2-source.tar.gz`: the source snapshot, without original game data.
+- `bedlam2-ps5-v1.0.0-rc.3-source.tar.gz`: the source snapshot, without original game data.
 - `SHA256SUMS`: SHA-256 checksums for both archives.
 
 Original DOS game data is not included. Use files from a copy you are legally
@@ -26,16 +27,16 @@ entitled to use.
 
 ## Manual installation
 
-1. Download `PPSA94003.zip` from the [release page](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.2) and extract it on your computer.
+1. Download `PPSA94003.zip` from the [release page](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.3) and extract it on your computer.
 2. Connect to your PS5 homebrew FTP server and copy the extracted `PPSA94003/` folder to `/data/homebrew/`.
 3. Open [ShadowMountPlus](https://github.com/drakmor/ShadowMountPlus) and register `/data/homebrew/PPSA94003/` as an app folder.
 4. Use FTP to copy the contents of your own Bedlam 2 game-data folder to `/data/Bedlam2PS5/content/`. Create the directory if needed and put the files directly there, not inside another nested `bed2/` folder.
 5. Launch Bedlam 2 from ShadowMountPlus. The app reads game data from `/data/Bedlam2PS5/content/` and stores saves and generated files in `/data/Bedlam2PS5/saves/`.
 
-When updating from RC.1, copy the contents of
+When updating from RC.1 or RC.2, copy the contents of
 `/data/homebrew/PPSA94003/assets/bed2/` to `/data/Bedlam2PS5/content/`, keeping
 the directory structure. Copy existing `MIRAGE/AB_BED/` save files to
-`/data/Bedlam2PS5/saves/MIRAGE/AB_BED/`. Keep the old copies until RC.2 has
+`/data/Bedlam2PS5/saves/MIRAGE/AB_BED/`. Keep the old copies until RC.3 has
 successfully launched and loaded your data. The app can fall back to old save
 files and migrates a save when it is written.
 

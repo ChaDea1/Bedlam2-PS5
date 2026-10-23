@@ -7,9 +7,9 @@ on the [8street source project](https://github.com/8street/Bedlam2). It runs the
 game's engine with an SDL frontend and DualSense support, rather than through
 DOSBox. This is a fan project and is not an official release.
 
-## Version 1.0.0-rc.2
+## Version 1.0.0-rc.3
 
-The second 1.0 release candidate includes persistent storage for game files,
+The third 1.0 release candidate includes persistent storage for game files,
 saves, and generated files. Original Bedlam 2 game data is not bundled and must
 be supplied separately.
 
@@ -21,10 +21,10 @@ game files in `/data/Bedlam2PS5/content/`; the app creates
 updates replace `/data/homebrew/PPSA94003/` and leave these two data folders in
 place.
 
-When updating from RC.1, copy the contents of
+When updating from RC.1 or RC.2, copy the contents of
 `/data/homebrew/PPSA94003/assets/bed2/` to `/data/Bedlam2PS5/content/`, keeping
 the directory structure. Copy any existing files in `MIRAGE/AB_BED/` to
-`/data/Bedlam2PS5/saves/MIRAGE/AB_BED/`. Keep the old app-folder copy until RC.2
+`/data/Bedlam2PS5/saves/MIRAGE/AB_BED/`. Keep the old app-folder copy until RC.3
 has launched and loaded your data successfully. The app can fall back to old
 save files and migrates a save when it is written.
 
@@ -42,7 +42,7 @@ save files and migrates a save when it is written.
 
 ## Download
 
-Download the [Bedlam 2 PS5 1.0.0-rc.2 release](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.2).
+Download the [Bedlam 2 PS5 1.0.0-rc.3 release](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.3).
 It includes `PPSA94003.zip`, the PS5 application package, a source archive, and
 `SHA256SUMS` for verifying the downloads. Neither archive includes the original
 DOS game files.
@@ -57,7 +57,7 @@ DOS game files.
 
 ## Manual installation
 
-1. Download `PPSA94003.zip` from the [release page](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.2) and extract it on your computer.
+1. Download `PPSA94003.zip` from the [release page](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.3) and extract it on your computer.
 2. Connect to your PS5 homebrew FTP server and copy the extracted `PPSA94003/` folder to `/data/homebrew/`.
 3. Open ShadowMountPlus and register `/data/homebrew/PPSA94003/` as an app folder.
 4. Use FTP to copy the contents of your own Bedlam 2 game-data folder to `/data/Bedlam2PS5/content/`. Create the directory if needed. Place the files directly there, not inside another nested `bed2/` folder.
