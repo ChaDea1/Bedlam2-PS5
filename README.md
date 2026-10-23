@@ -4,7 +4,8 @@
 
 A native PS5 port of *Bedlam 2: Absolute Bedlam*, based on the source project by
 [8street](https://github.com/8street/Bedlam2). It uses the game's native engine
-with an SDL frontend and DualSense controls. The port is still experimental.
+with an SDL frontend and DualSense controls. Version 1.0.0 is in release-candidate
+testing.
 
 ## Original game data is not included
 
@@ -31,7 +32,9 @@ from `/app0/assets/bed2`.
 ## Install on PS5
 
 When the app is accepted into the Prospero homebrew catalog, install it through
-ProsperoStore. Until then, use the release ZIP: extract it and copy the
+ProsperoStore. Until then, download the
+[1.0.0-rc.1 app ZIP](https://github.com/ChaDea1/Bedlam2-PS5/releases/download/01.000.000-rc.1/PPSA94003.zip),
+extract it, and copy the
 `PPSA94003` folder to `/data/homebrew/`, then register it with ShadowMountPlus.
 Supply the original data at the path above before launching the game.
 
