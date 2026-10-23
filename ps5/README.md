@@ -1,9 +1,10 @@
 # PS5 port
 
 This is a native PS5 application, not a DOSBox package. Version 1.0.0-rc.4 is
-the current release candidate. It fixes the active-robot death crash, the
-brief death-screen palette flash, and palette rendering in the opening splash
-screens. The first visit to weapon selection can take longer than later visits.
+the current release candidate. It fixes the active-robot death crash and the
+brief death-screen palette flash. Opening splash screens now render with the
+correct palette; they were not appearing in earlier builds. The first visit to
+weapon selection can take longer than later visits.
 See the [root README](../README.md) for features,
 DualSense controls, manual installation, and game-data instructions.
 

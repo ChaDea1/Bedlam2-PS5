@@ -9,11 +9,12 @@ DOSBox. This is a fan project and is not an official release.
 
 ## Version 1.0.0-rc.4
 
-The fourth 1.0 release candidate fixes the crash when the active robot dies,
-the brief incorrect-color flash on the death screen, and palette rendering in
-the opening splash screens. It also reduces memory use by keeping raw sound
-effects compact and resampling them during playback. Original Bedlam 2 game
-data is not bundled and must be supplied separately.
+The fourth 1.0 release candidate fixes the crash when the active robot dies
+and the brief incorrect-color flash on the death screen. The opening splash
+screens now render with the correct palette; they were not appearing in earlier
+builds. RC4 also reduces memory use by keeping raw sound effects compact and
+resampling them during playback. Original Bedlam 2 game data is not bundled
+and must be supplied separately.
 
 ## Persistent data layout
 

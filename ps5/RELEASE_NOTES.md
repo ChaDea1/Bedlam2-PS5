@@ -1,10 +1,11 @@
 # Bedlam 2: Absolute Bedlam PS5 v1.0.0-rc.4
 
 RC.4 fixes the active-robot death crash and the brief incorrect-color flash
-when the death screen appears. Opening splash screens now render with the
-correct palette as well. The audio mixer keeps raw effects in their compact
-source format and resamples during playback, reducing memory use. The PS5 app
-content version is `01.000.002` so consoles recognize it as an update.
+when the death screen appears. The opening splash screens now render with the
+correct palette; they were not appearing in earlier builds. The audio mixer
+keeps raw effects in their compact source format and resamples during playback,
+reducing memory use. The PS5 app content version is `01.000.002` so consoles
+recognize it as an update.
 
 ## What's included
 
@@ -26,7 +27,7 @@ entitled to use.
 - Pause and exit-level notices with a drop shadow, plus an exit confirmation.
 - The active PS5 profile name can fill the game's default player-name field.
 - Game data lives in `/data/Bedlam2PS5/content/`; saves and generated files live in `/data/Bedlam2PS5/saves/`, outside the app folder so app updates preserve them.
-- Opening splash screens and death-screen colors now render with the correct palette; the brief death-screen rainbow flash and active-robot death crash are fixed.
+- Opening splash screens now appear with the correct palette; the brief death-screen rainbow flash and active-robot death crash are fixed.
 - Reduced audio memory use by resampling compact raw effects during playback.
 
 ## Manual installation
