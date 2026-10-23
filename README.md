@@ -13,6 +13,22 @@ The first 1.0 release candidate is available for PS5 testing. The release
 contains the native PS5 app package. Original Bedlam 2 game data is not bundled
 and must be supplied separately.
 
+## Persistent data layout in the current test build
+
+The current native test build keeps user data outside the replaceable app
+folder. Put the original game files in `/data/Bedlam2PS5/content/`; the app
+creates `/data/Bedlam2PS5/saves/` for saves and other generated files. Prospero
+app updates replace `/data/homebrew/PPSA94003/` and leave these two data folders
+in place.
+
+Before moving from the published RC.1 package to this build, copy the contents
+of `/data/homebrew/PPSA94003/assets/bed2/` to
+`/data/Bedlam2PS5/content/`, keeping the directory structure. Copy any existing
+files in `MIRAGE/AB_BED/` to
+`/data/Bedlam2PS5/saves/MIRAGE/AB_BED/`. Keep the old app-folder copy until the
+new build has launched successfully. The public RC.1 package still uses the
+old app-folder path described below.
+
 ## Features
 
 - Twin-stick play: move the active robot with the left stick and aim with the

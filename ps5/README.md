@@ -34,6 +34,14 @@ copies `assets/bed2/`. The app expects user-supplied Bedlam 2 data at
 `/app0/assets/bed2`, corresponding to
 `/data/homebrew/PPSA94003/assets/bed2/` on the console.
 
+The current native test build moves user files out of the replaceable app
+folder: game data belongs in `/data/Bedlam2PS5/content/`, and generated saves
+belong in `/data/Bedlam2PS5/saves/`. Startup creates both directories when
+needed. When upgrading from the published RC.1 package, copy the game-data tree
+from `/data/homebrew/PPSA94003/assets/bed2/` into `content/` and copy existing
+`MIRAGE/AB_BED/` files into `saves/MIRAGE/AB_BED/` before replacing the app.
+Keep the old app-folder copy until the new build has been confirmed.
+
 `PORT_STATUS.md` and `NATIVE_DEBUG_HANDOFF.md` are local development notes and
 are intentionally excluded from the public repository because they contain
 console network details and machine-specific paths.

@@ -8,6 +8,24 @@
 #include "palette.h"
 #include "screenshot.h"
 #include "sdl_window.h"
+#ifdef BEDLAM2_PS5_NATIVE
+#include "native_data_path.hpp"
+#endif
+
+namespace
+{
+FILE *open_screenshot_file(const char *filename, const char *mode)
+{
+#ifdef BEDLAM2_PS5_NATIVE
+    char save_path[4096];
+    if (!bedlam2_ps5_resolve_save_path(filename, save_path, sizeof(save_path)))
+        return nullptr;
+    return fopen(save_path, mode);
+#else
+    return fopen(filename, mode);
+#endif
+}
+} // namespace
 
 #ifdef _MSC_VER
 #    pragma warning(disable : 4996)
@@ -55,14 +73,14 @@ int save_screenshot()
         {
             NUM_SCREENSHOTS = 9999;
         }
-        file = fopen(filename, "rb");
+        file = open_screenshot_file(filename, "rb");
         if (!file)
         {
             break;
         }
         fclose(file);
     }
-    file = fopen(filename, "wb");
+    file = open_screenshot_file(filename, "wb");
     if (file)
     {
         bmp_file_header.bfType = 'MB';

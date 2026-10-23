@@ -34,29 +34,43 @@ int main(int argc, char *argv[])
         bedlam2_ps5_trace("Bedlam2 trace: native SDL memory init failed\n");
         return 3;
     }
-    const char *game_data_dir = "";
+    if (bedlam2_ps5_init_storage() != 0)
+    {
+        bedlam2_ps5_trace("Bedlam2 trace: persistent storage init failed\n");
+        if (SDL_Init(SDL_INIT_VIDEO) == 0)
+        {
+            SDL_ShowSimpleMessageBox(
+                SDL_MESSAGEBOX_ERROR, "Bedlam 2",
+                "Unable to create /data/Bedlam2PS5/content and /data/Bedlam2PS5/saves. "
+                "Check that the PS5 data partition is available and writable.",
+                nullptr);
+            SDL_Quit();
+        }
+        return 4;
+    }
+
+    const char *game_data_dir = "/data/Bedlam2PS5/content";
     bool game_data_found = false;
+    bool using_legacy_app_data = false;
     const char *game_data_dirs[] = {
-        "",
-        "bed2",
-        "assets/bed2",
+        "/data/Bedlam2PS5/content",
         "/app0/assets/bed2",
+        "/app0/bed2",
+        "/app0",
     };
     for (const char *candidate : game_data_dirs)
     {
         char palette_path[512];
-        const int path_length = candidate[0] == '\0'
-                                    ? std::snprintf(palette_path, sizeof(palette_path),
-                                                    "GAMEGFX/GAMEPAL.PAL")
-                                    : std::snprintf(palette_path, sizeof(palette_path),
-                                                    "%s/GAMEGFX/GAMEPAL.PAL", candidate);
-        if (path_length > 0 && static_cast<std::size_t>(path_length) < sizeof(palette_path))
+        bedlam2_ps5_set_data_root(candidate);
+        if (bedlam2_ps5_resolve_data_path("GAMEGFX/GAMEPAL.PAL", palette_path,
+                                          sizeof(palette_path)))
         {
             std::FILE *palette = std::fopen(palette_path, "rb");
             if (palette != nullptr)
             {
                 std::fclose(palette);
                 game_data_dir = candidate;
+                using_legacy_app_data = candidate != game_data_dirs[0];
                 game_data_found = true;
                 break;
             }
@@ -64,19 +78,26 @@ int main(int argc, char *argv[])
     }
     if (!game_data_found)
     {
+        bedlam2_ps5_set_data_root("/data/Bedlam2PS5/content");
         bedlam2_ps5_trace("Bedlam2 trace: game data missing\n");
         if (SDL_Init(SDL_INIT_VIDEO) == 0)
         {
             SDL_ShowSimpleMessageBox(
                 SDL_MESSAGEBOX_ERROR, "Bedlam 2",
-                "Game data is missing. Put the original files under "
-                "assets/bed2 in the app package or bed2 beside the application.",
+                "Game data is missing. Copy the original files into "
+                "/data/Bedlam2PS5/content (for example, GAMEGFX, MIRAGE, and SOUND). "
+                "The saves folder is created at /data/Bedlam2PS5/saves.",
                 nullptr);
             SDL_Quit();
         }
         return 4;
     }
     bedlam2_ps5_set_data_root(game_data_dir);
+    if (using_legacy_app_data)
+    {
+        bedlam2_ps5_trace(
+            "Bedlam2 trace: using legacy app-folder data; move it to /data/Bedlam2PS5/content before future app updates\n");
+    }
     bedlam2_ps5_trace("Bedlam2 trace: game data ready\n");
 #endif
 
