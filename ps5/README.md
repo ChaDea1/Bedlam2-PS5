@@ -1,8 +1,9 @@
 # PS5 port
 
-This is a native PS5 application, not a DOSBox package. It has been launched on
-console and reaches gameplay, but the port remains experimental. The first visit
-to weapon selection can take longer than later visits.
+This is a native PS5 application, not a DOSBox package. Version 1.0.0-rc.1 is
+the first release candidate. The first visit to weapon selection can take
+longer than later visits. See the [root README](../README.md) for features,
+DualSense controls, manual installation, and game-data instructions.
 
 ## Dependencies
 
