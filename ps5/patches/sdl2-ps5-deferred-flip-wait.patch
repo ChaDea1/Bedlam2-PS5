@@ -1,0 +1,99 @@
+--- a/src/video/ps5/SDL_ps5video.c
++++ b/src/video/ps5/SDL_ps5video.c
+@@ -71,8 +71,7 @@
+                                        const SDL_Rect *rects, int numrects)
+ {
+     PS5_DeviceData *device_data = (PS5_DeviceData *)_this->driverdata;
+-    static uint32_t frame_id = 0;
+-    uint8_t idx = frame_id % 2;
++    uint8_t idx;
+     SDL_Surface *surface;
+     struct kevent evt;
+     int junk;
+@@ -82,6 +81,17 @@
+         return SDL_SetError("Couldn't find surface for window");
+     }
+ 
++    /* Let the submitted frame reach the display before reusing its alternate
++       buffer. This consumes the previous flip event, so presenting the newest
++       frame does not make the simulation thread wait for its own vblank. */
++    if (device_data->has_pending_flip) {
++        if (sceKernelWaitEqueue(device_data->evt_queue, &evt, 1, &junk, 0)) {
++            return SDL_SetError("sceKernelWaitEqueue: %s", strerror(errno));
++        }
++        device_data->has_pending_flip = SDL_FALSE;
++    }
++    idx = (uint8_t)(device_data->frame_id % 2);
++
+     if(surface->w == device_data->surface->w &&
+        surface->h == device_data->surface->h) {
+         PS5_Tilemap_Blit(device_data->tmap, surface->pixels, surface->pitch / 4,
+@@ -101,14 +111,13 @@
+                          (device_data->surface->h - surface->h) / 2);
+     }
+ 
+-    if (sceVideoOutSubmitFlip(device_data->handle, idx, 1, frame_id)) {
++    if (sceVideoOutSubmitFlip(device_data->handle, idx, 1,
++                              (int64_t)device_data->frame_id)) {
+         return SDL_SetError("sceVideoOutSubmitFlip: %s", strerror(errno));
+     }
+ 
+-    if (sceKernelWaitEqueue(device_data->evt_queue, &evt, 1, &junk, 0)) {
+-        return SDL_SetError("sceKernelWaitEqueue: %s", strerror(errno));
+-    }
+-    frame_id++;
++    ++device_data->frame_id;
++    device_data->has_pending_flip = SDL_TRUE;
+ 
+     return 0;
+ }
+@@ -140,6 +149,15 @@
+                             mode->w, mode->h);
+     }
+ 
++    if (device_data->has_pending_flip) {
++        struct kevent evt;
++        int junk;
++        if (sceKernelWaitEqueue(device_data->evt_queue, &evt, 1, &junk, 0)) {
++            return SDL_SetError("sceKernelWaitEqueue: %s", strerror(errno));
++        }
++        device_data->has_pending_flip = SDL_FALSE;
++    }
++
+     if(device_data->evt_queue) {
+         sceVideoOutDeleteFlipEvent(device_data->evt_queue, device_data->handle);
+         sceKernelDeleteEqueue(device_data->evt_queue);
+@@ -184,6 +202,8 @@
+     PS5_Tilemap_Destroy(device_data->tmap);
+     device_data->surface = surface;
+     device_data->tmap = tmap;
++    device_data->frame_id = 0;
++    device_data->has_pending_flip = SDL_FALSE;
+ 
+     return 0;
+ }
+@@ -268,6 +288,13 @@
+ {
+     PS5_DeviceData *device_data = (PS5_DeviceData *)_this->driverdata;
+ 
++    if (device_data->has_pending_flip && device_data->evt_queue) {
++        struct kevent evt;
++        int junk;
++        (void)sceKernelWaitEqueue(device_data->evt_queue, &evt, 1, &junk, 0);
++        device_data->has_pending_flip = SDL_FALSE;
++    }
++
+     if (device_data->handle != 0) {
+         sceVideoOutClose(device_data->handle);
+         device_data->handle = 0;
+--- a/src/video/ps5/SDL_ps5video.h
++++ b/src/video/ps5/SDL_ps5video.h
+@@ -43,6 +43,8 @@
+     int handle;
+     PS5_VideoBuf vbuf[2];
+     struct kevent *evt_queue;
++    uint64_t frame_id;
++    SDL_bool has_pending_flip;
+     intptr_t paddr;
+     size_t memsize;
+     SDL_Surface *surface;

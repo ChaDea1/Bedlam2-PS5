@@ -1,0 +1,11 @@
+--- a/src/audio/ps5/SDL_ps5audio.c
++++ b/src/audio/ps5/SDL_ps5audio.c
+@@ -113,7 +113,7 @@
+     }
+ 
+     if (this->hidden->mixbuf) {
+-        free(this->hidden->mixbuf);
++        SDL_free(this->hidden->mixbuf);
+         this->hidden->mixbuf = 0;
+     }
+ }

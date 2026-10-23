@@ -1,0 +1,23 @@
+--- a/src/render/software/SDL_render_sw.c
++++ b/src/render/software/SDL_render_sw.c
+@@ -110,6 +110,10 @@
+     texture->driverdata =
+         SDL_CreateRGBSurface(0, texture->w, texture->h, bpp, Rmask, Gmask,
+                              Bmask, Amask);
++    /* Preserve the allocation/format error before setters reject NULL. */
++    if (!texture->driverdata) {
++        return -1;
++    }
+     SDL_SetSurfaceColorMod(texture->driverdata, texture->color.r, texture->color.g, texture->color.b);
+     SDL_SetSurfaceAlphaMod(texture->driverdata, texture->color.a);
+     SDL_SetSurfaceBlendMode(texture->driverdata, texture->blendMode);
+@@ -121,9 +125,6 @@
+         SDL_SetSurfaceRLE(texture->driverdata, 1);
+     }
+ 
+-    if (!texture->driverdata) {
+-        return -1;
+-    }
+     return 0;
+ }
+ 

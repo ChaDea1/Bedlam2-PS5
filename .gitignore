@@ -1,0 +1,105 @@
+*.7z
+*.a
+*.d
+*.dll
+*.exe
+*.o
+*.tmp
+*.zip
+/build/
+
+# The release package is assembled locally. Never track the PS5 executable,
+# runtime PRX, or user-supplied game data in the source repository.
+/PPSA94003/eboot.bin
+/PPSA94003/sce_module/libc.prx
+/PPSA94003/assets/bed2/
+
+# Local launch handoffs and logs contain console network details and machine paths.
+/ps5/NATIVE_DEBUG_HANDOFF.md
+/ps5/PORT_STATUS.md
+/elf64_probe.err
+/jwasm64_probe.err
+
+# User-supplied original Bedlam 2 distribution; do not publish game files.
+/bed2/
+
+# Visual Studio files
+*.code-workspace
+*.exp
+*.ilk
+*.opensdf
+*.pdb
+*.sdf
+*.suo
+*.user
+.vs/
+.vscode/
+Debug*/
+Release*/
+vc2019/.vs/
+vc2019/.vscode/
+vc2019/Debug*/
+vc2019/Release*/
+
+# Temporary and backup files
+*.bak
+*.cbTemp
+*.sw?
+*~
+\#*
+gmon.out
+
+# System Files
+.DS_Store
+._.DS_Store
+Thumbs.db
+cscope.*
+tags
+
+# Netbeans IDE folders
+nbproject/
+
+# Python runtime files
+*.pyc
+
+# vim files
+*.vim
+*.session
+.ycm_extra_conf.py
+.vimrc
+
+# taskwarrior files
+*.task*
+
+# GitEye files
+*.project
+
+# vimdiff backup
+*.orig
+
+# coredumps
+*.core
+
+# sublime-text workspace
+*.sublime-workspace
+
+# cppcheck
+*cppcheck.xml
+*.cppcheck
+
+# clang tooling
+compile_commands.json
+.clangd
+
+# Snapcraft build file
+*.snap
+
+# Eclipse IDE
+.cproject
+.settings/
+
+# Apple Xcode IDE
+Xcode/
+
+# gdb
+.gdb_history
