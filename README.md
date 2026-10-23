@@ -7,11 +7,12 @@ on the [8street source project](https://github.com/8street/Bedlam2). It runs the
 game's engine with an SDL frontend and DualSense support, rather than through
 DOSBox. This is a fan project and is not an official release.
 
-## Version 1.0.0-rc.3
+## Version 1.0.0-rc.4
 
-The third 1.0 release candidate includes persistent storage for game files,
-saves, and generated files. Original Bedlam 2 game data is not bundled and must
-be supplied separately.
+The fourth 1.0 release candidate fixes the crash when the active robot dies and
+the brief incorrect-color flash on the death screen. It also reduces memory
+use by keeping raw sound effects compact and resampling them during playback.
+Original Bedlam 2 game data is not bundled and must be supplied separately.
 
 ## Persistent data layout
 
@@ -24,10 +25,11 @@ place.
 When updating from RC.1, copy the contents of
 `/data/homebrew/PPSA94003/assets/bed2/` to `/data/Bedlam2PS5/content/`, keeping
 the directory structure. Copy any existing files in `MIRAGE/AB_BED/` to
-`/data/Bedlam2PS5/saves/MIRAGE/AB_BED/`. Keep the old app-folder copy until RC.3
-has launched and loaded your data successfully. The app can fall back to old
-save files and migrates a save when it is written. RC.2 already used the
-persistent paths, so no file migration is needed when updating from RC.2.
+`/data/Bedlam2PS5/saves/MIRAGE/AB_BED/`. Keep the old app-folder copy until
+RC.4 has launched and loaded your data successfully. The app can fall back to
+old save files and migrates a save when it is written. RC.2 and later already
+used the persistent paths, so no file migration is needed when updating from
+those releases.
 
 ## Features
 
@@ -43,7 +45,7 @@ persistent paths, so no file migration is needed when updating from RC.2.
 
 ## Download
 
-Download the [Bedlam 2 PS5 1.0.0-rc.3 release](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.3).
+Download the [Bedlam 2 PS5 1.0.0-rc.4 release](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.4).
 It includes `PPSA94003.zip`, the PS5 application package, a source archive, and
 `SHA256SUMS` for verifying the downloads. Neither archive includes the original
 DOS game files.
@@ -58,7 +60,7 @@ DOS game files.
 
 ## Manual installation
 
-1. Download `PPSA94003.zip` from the [release page](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.3) and extract it on your computer.
+1. Download `PPSA94003.zip` from the [release page](https://github.com/ChaDea1/Bedlam2-PS5/releases/tag/01.000.000-rc.4) and extract it on your computer.
 2. Connect to your PS5 homebrew FTP server and copy the extracted `PPSA94003/` folder to `/data/homebrew/`.
 3. Open ShadowMountPlus and register `/data/homebrew/PPSA94003/` as an app folder.
 4. Use FTP to copy the contents of your own Bedlam 2 game-data folder to `/data/Bedlam2PS5/content/`. Create the directory if needed. Place the files directly there, not inside another nested `bed2/` folder.
@@ -109,8 +111,6 @@ game action is available.
 
 ## Known issues
 
-- The game currently crashes when the active robot dies during gameplay. A
-  fix is planned for RC.4.
 - The first visit to the weapon-selection screen can load more slowly than
   later visits.
 

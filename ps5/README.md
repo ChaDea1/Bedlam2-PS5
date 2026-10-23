@@ -1,7 +1,8 @@
 # PS5 port
 
-This is a native PS5 application, not a DOSBox package. Version 1.0.0-rc.1 is
-the first release candidate. The first visit to weapon selection can take
+This is a native PS5 application, not a DOSBox package. Version 1.0.0-rc.4 is
+the current release candidate. It fixes the active-robot death crash and the
+brief death-screen palette flash. The first visit to weapon selection can take
 longer than later visits. See the [root README](../README.md) for features,
 DualSense controls, manual installation, and game-data instructions.
 
@@ -34,13 +35,12 @@ copies `assets/bed2/`. The app expects user-supplied Bedlam 2 data at
 `/app0/assets/bed2`, corresponding to
 `/data/homebrew/PPSA94003/assets/bed2/` on the console.
 
-The current native test build moves user files out of the replaceable app
-folder: game data belongs in `/data/Bedlam2PS5/content/`, and generated saves
-belong in `/data/Bedlam2PS5/saves/`. Startup creates both directories when
-needed. When upgrading from the published RC.1 package, copy the game-data tree
-from `/data/homebrew/PPSA94003/assets/bed2/` into `content/` and copy existing
+Game data belongs in `/data/Bedlam2PS5/content/`, and generated saves belong
+in `/data/Bedlam2PS5/saves/`. Startup creates both directories when needed.
+When upgrading from RC.1, copy the game-data tree from
+`/data/homebrew/PPSA94003/assets/bed2/` into `content/` and copy existing
 `MIRAGE/AB_BED/` files into `saves/MIRAGE/AB_BED/` before replacing the app.
-Keep the old app-folder copy until the new build has been confirmed.
+Keep the old app-folder copy until RC.4 has launched and loaded your data.
 
 `PORT_STATUS.md` and `NATIVE_DEBUG_HANDOFF.md` are local development notes and
 are intentionally excluded from the public repository because they contain

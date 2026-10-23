@@ -1,4 +1,5 @@
 #include "sdl_event.h"
+#include "bedlam2.h"
 #include "keyboard.h"
 #include "main.h"
 #include "mouse.h"
@@ -70,15 +71,33 @@ int mouse_events(const SDL_Event &event)
 int palette_events(const SDL_Event &event)
 {
     int ret_val = 0;
+    const bool death_screen = !game_is_playing && dead_screen_scale == 480;
+    if (!death_screen)
+    {
+        DEATH_PALETTE_FINALIZED = 0;
+    }
     if (event.type == SDL_USEREVENT)
     {
         if (event.user.type == SDL_USEREVENT && event.user.code == 0)
         {
             if (NEW_PALETTE)
             {
+                // A timer callback already in flight can queue one more tween
+                // frame after the final death palette was applied.
+                if (death_screen && DEATH_PALETTE_FINALIZED)
+                {
+                    NEW_PALETTE = nullptr;
+                    return ret_val;
+                }
                 ret_val |= GAME_WINDOW.set_palette((uint8_t *)NEW_PALETTE, 0, 256);
-                // GAME_WINDOW.redraw();
                 NEW_PALETTE = NULL;
+                // The game-over loop waits for input while pumping events but
+                // does not redraw. Refresh non-gameplay screens after palette
+                // steps so the final death-screen palette reaches the texture.
+                if (!game_is_playing && !death_screen)
+                {
+                    ret_val |= GAME_WINDOW.present_current_frame();
+                }
             }
         }
     }

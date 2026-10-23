@@ -4,6 +4,7 @@
 
 #include "bedlam2.h"
 #include "bedlam2_draw.h"
+#include "palette.h"
 #include "sdl_event.h"
 #include "sdl_window.h"
 #include "timer.h"
@@ -361,13 +362,36 @@ int Window::render_scene()
 
 int Window::redraw()
 {
+    const bool death_screen = !game_is_playing && dead_screen_scale == 480;
+    if (!death_screen)
+    {
+        DEATH_PALETTE_FINALIZED = 0;
+    }
+
     int ret_val = 0;
-    ret_val |= render_scene();
-    SDL_RenderPresent(m_renderer);
+    if (death_screen && !DEATH_PALETTE_FINALIZED)
+    {
+        // Game-over draws the indexed death image before installing its own
+        // palette. Keep that intermediate frame hidden until the final palette
+        // is ready, otherwise it flashes with the gameplay colors.
+        ret_val |= clear_render();
+        SDL_RenderPresent(m_renderer);
+    }
+    else
+    {
+        ret_val |= present_current_frame();
+    }
 #ifdef BEDLAM2_PS5_NATIVE
     trace_shop_frame_rate();
 #endif
     SDL_events();
+    return ret_val;
+}
+
+int Window::present_current_frame()
+{
+    int ret_val = render_scene();
+    SDL_RenderPresent(m_renderer);
     return ret_val;
 }
 

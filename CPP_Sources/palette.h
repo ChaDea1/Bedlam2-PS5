@@ -3,6 +3,7 @@
 
 extern volatile int32_t PALETTE_TIMER;
 extern volatile uint8_t *NEW_PALETTE;
+extern volatile int32_t DEATH_PALETTE_FINALIZED;
 
 extern "C" void set_palette(uint8_t *pal_file);
 void palette_animation();

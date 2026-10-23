@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 
+#include <cstddef>
 #include <cstdint>
 
 #define MIX_MAX_VOLUME 128
@@ -12,6 +13,9 @@ struct Mix_Chunk
     Uint8 *abuf;
     Uint32 alen;
     Uint8 volume;
+    SDL_AudioFormat format;
+    Uint8 channels;
+    int frequency;
 };
 
 #ifdef __cplusplus
@@ -23,6 +27,7 @@ void Mix_CloseAudio();
 int Mix_AllocateChannels(int channels);
 int Mix_ReserveChannels(int channels);
 Mix_Chunk *Mix_LoadWAV_RW(SDL_RWops *source, int free_source);
+Mix_Chunk *Mix_LoadRAW(const Uint8 *source, size_t source_length);
 void Mix_FreeChunk(Mix_Chunk *chunk);
 int Mix_Volume(int channel, int volume);
 int Mix_VolumeChunk(Mix_Chunk *chunk, int volume);

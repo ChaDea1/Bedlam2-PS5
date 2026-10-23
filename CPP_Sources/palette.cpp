@@ -1,9 +1,11 @@
 #include "palette.h"
+#include "bedlam2.h"
 #include "helper.h"
 #include "sdl_event.h"
 #include "sdl_window.h"
 
 volatile int32_t PALETTE_TIMER;
+volatile int32_t DEATH_PALETTE_FINALIZED;
 uint8_t ANIMATE_PALETTE_PTR[780];
 uint8_t ANIMATE_PALETTE_BUFER[3082];
 volatile uint8_t *NEW_PALETTE;
@@ -58,6 +60,37 @@ void swap_palette_with_animation(uint8_t *palette_file_ptr, int time)
 
     PALETTE_TIMER = 0;
     palette_ptr = palette_file_ptr + 2;
+
+    // The game-over screen first draws its image while transitioning from the
+    // gameplay palette. Apply its loaded final palette immediately so the
+    // player never sees the temporary rainbow/intermediate colors. Keep the
+    // normal fades everywhere else.
+    if (!game_is_playing && dead_screen_scale == 480)
+    {
+        bool has_color = false;
+        for (int i = 0; i < 768; ++i)
+        {
+            if (palette_ptr[i] != 0)
+            {
+                has_color = true;
+                break;
+            }
+        }
+        if (has_color)
+        {
+            DEATH_PALETTE_FINALIZED = 1;
+            NEW_PALETTE = nullptr;
+            GAME_WINDOW.set_palette(palette_ptr, 0, 256);
+            GAME_WINDOW.present_current_frame();
+            return;
+        }
+        DEATH_PALETTE_FINALIZED = 0;
+    }
+    else
+    {
+        DEATH_PALETTE_FINALIZED = 0;
+    }
+
     buf_file = ANIMATE_PALETTE_BUFER;
     screen_palette_ptr = GAME_WINDOW.get_RGB_palette_ptr();
     end_pallete = screen_palette_ptr + 768;

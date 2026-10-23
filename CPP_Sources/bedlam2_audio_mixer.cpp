@@ -3,6 +3,7 @@
 #    include "bedlam2_audio_mixer.h"
 
 #    include <algorithm>
+#    include <climits>
 #    include <cstdlib>
 #    include <cstring>
 #    include <vector>
@@ -11,11 +12,12 @@ namespace
 {
     constexpr int kDefaultChannels = 8;
     constexpr int kMixBufferSamples = 8192;
+    constexpr Uint64 kAudioPhaseOne = Uint64{1} << 32;
 
     struct Channel
     {
         Mix_Chunk *chunk = nullptr;
-        Uint32 position = 0;
+        Uint64 source_phase = 0;
         int loops_remaining = 0;
         int volume = MIX_MAX_VOLUME;
         Uint8 left = 255;
@@ -34,6 +36,8 @@ namespace
     };
 
     Mixer g_mixer;
+
+    void stop_channel(Channel &channel);
 
     void audio_callback(void *userdata, Uint8 *stream, int length)
     {
@@ -56,17 +60,30 @@ namespace
             for (Channel &channel : mixer->channels)
             {
                 Mix_Chunk *chunk = channel.chunk;
-                if (!chunk || !chunk->abuf || chunk->alen < 4)
+                if (!chunk || !chunk->abuf || chunk->alen == 0 || chunk->frequency <= 0
+                    || chunk->channels == 0)
                 {
                     continue;
                 }
 
-                const int16_t *samples = reinterpret_cast<const int16_t *>(chunk->abuf);
-                const Uint32 total_frames = chunk->alen / 4;
+                const Uint32 bytes_per_frame = (SDL_AUDIO_BITSIZE(chunk->format) / 8) * chunk->channels;
+                if (bytes_per_frame == 0)
+                {
+                    stop_channel(channel);
+                    continue;
+                }
+                const Uint32 total_frames = chunk->alen / bytes_per_frame;
+                const Uint64 total_phase = static_cast<Uint64>(total_frames) * kAudioPhaseOne;
+                const Uint64 source_step = std::max<Uint64>(1,
+                    (static_cast<Uint64>(chunk->frequency) * kAudioPhaseOne) / mixer->frequency);
+                if (total_frames == 0 || total_phase == 0)
+                {
+                    stop_channel(channel);
+                    continue;
+                }
                 for (int frame = 0; frame < frames; ++frame)
                 {
-                    Uint32 source_frame = channel.position / 4;
-                    if (source_frame >= total_frames)
+                    while (channel.source_phase >= total_phase)
                     {
                         if (channel.loops_remaining == 0)
                         {
@@ -77,8 +94,11 @@ namespace
                         {
                             --channel.loops_remaining;
                         }
-                        channel.position = 0;
-                        source_frame = 0;
+                        channel.source_phase -= total_phase;
+                    }
+                    if (!channel.chunk)
+                    {
+                        break;
                     }
 
                     int volume = channel.volume;
@@ -95,15 +115,38 @@ namespace
                         }
                     }
 
-                    const int left = samples[source_frame * 2];
-                    const int right = samples[source_frame * 2 + 1];
+                    const Uint32 source_frame = static_cast<Uint32>(channel.source_phase >> 32);
+                    const Uint32 next_source_frame = std::min(source_frame + 1, total_frames - 1);
+                    const Uint32 source_remainder = static_cast<Uint32>(channel.source_phase);
+                    int left = 0;
+                    int right = 0;
+                    if (chunk->format == AUDIO_U8 && chunk->channels == 1)
+                    {
+                        const int first = (static_cast<int>(chunk->abuf[source_frame]) - 128) * 256;
+                        const int second = (static_cast<int>(chunk->abuf[next_source_frame]) - 128) * 256;
+                        const int sample = first + static_cast<int>(static_cast<int64_t>(second - first)
+                            * source_remainder / kAudioPhaseOne);
+                        left = sample;
+                        right = sample;
+                    }
+                    else if (chunk->format == AUDIO_S16SYS && chunk->channels == 2)
+                    {
+                        const int16_t *samples = reinterpret_cast<const int16_t *>(chunk->abuf);
+                        left = samples[source_frame * 2];
+                        right = samples[source_frame * 2 + 1];
+                    }
+                    else
+                    {
+                        stop_channel(channel);
+                        break;
+                    }
                     const int chunk_volume = chunk->volume;
                     const int denominator = MIX_MAX_VOLUME * MIX_MAX_VOLUME * 255;
                     mixer->accumulation[frame * 2] += static_cast<int32_t>(
                         static_cast<int64_t>(left) * volume * chunk_volume * channel.left / denominator);
                     mixer->accumulation[frame * 2 + 1] += static_cast<int32_t>(
                         static_cast<int64_t>(right) * volume * chunk_volume * channel.right / denominator);
-                    channel.position += 4;
+                    channel.source_phase += source_step;
 
                     if (!channel.chunk)
                     {
@@ -146,10 +189,73 @@ namespace
     void stop_channel(Channel &channel)
     {
         channel.chunk = nullptr;
-        channel.position = 0;
+        channel.source_phase = 0;
         channel.loops_remaining = 0;
         channel.fade_total = 0;
         channel.fade_remaining = 0;
+    }
+
+    Mix_Chunk *convert_audio(
+        const Uint8 *source, size_t source_length, SDL_AudioFormat source_format,
+        Uint8 source_channels, int source_frequency)
+    {
+        if (!source || source_length == 0 || source_length > static_cast<size_t>(INT_MAX))
+        {
+            SDL_SetError("Invalid audio source buffer");
+            return nullptr;
+        }
+
+        const int output_frequency = g_mixer.frequency > 0 ? g_mixer.frequency : 44100;
+        SDL_AudioStream *converter = SDL_NewAudioStream(
+            source_format, source_channels, source_frequency, AUDIO_S16SYS, 2, output_frequency);
+        if (!converter || SDL_AudioStreamPut(converter, source, static_cast<int>(source_length)) < 0
+            || SDL_AudioStreamFlush(converter) < 0)
+        {
+            if (converter)
+            {
+                SDL_FreeAudioStream(converter);
+            }
+            return nullptr;
+        }
+
+        const int available = SDL_AudioStreamAvailable(converter);
+        if (available < 4)
+        {
+            SDL_FreeAudioStream(converter);
+            SDL_SetError("Audio source contains no converted samples");
+            return nullptr;
+        }
+
+        const Uint32 length = static_cast<Uint32>(available - (available % 4));
+        Mix_Chunk *chunk = static_cast<Mix_Chunk *>(SDL_malloc(sizeof(Mix_Chunk)));
+        Uint8 *buffer = static_cast<Uint8 *>(SDL_malloc(length));
+        if (!chunk || !buffer)
+        {
+            SDL_free(chunk);
+            SDL_free(buffer);
+            SDL_FreeAudioStream(converter);
+            SDL_SetError("Out of memory loading audio chunk");
+            return nullptr;
+        }
+
+        const int received = SDL_AudioStreamGet(converter, buffer, static_cast<int>(length));
+        SDL_FreeAudioStream(converter);
+        if (received != static_cast<int>(length))
+        {
+            SDL_free(buffer);
+            SDL_free(chunk);
+            SDL_SetError("Unable to convert complete audio chunk");
+            return nullptr;
+        }
+
+        chunk->allocated = 1;
+        chunk->abuf = buffer;
+        chunk->alen = length;
+        chunk->volume = MIX_MAX_VOLUME;
+        chunk->format = AUDIO_S16SYS;
+        chunk->channels = 2;
+        chunk->frequency = output_frequency;
+        return chunk;
     }
 } // namespace
 
@@ -244,57 +350,41 @@ Mix_Chunk *Mix_LoadWAV_RW(SDL_RWops *source, int free_source)
         return nullptr;
     }
 
-    const int output_frequency = g_mixer.frequency > 0 ? g_mixer.frequency : 44100;
-    SDL_AudioStream *converter = SDL_NewAudioStream(
-        source_spec.format, source_spec.channels, source_spec.freq, AUDIO_S16SYS, 2, output_frequency);
-    if (!converter || SDL_AudioStreamPut(converter, source_buffer, static_cast<int>(source_length)) < 0
-        || SDL_AudioStreamFlush(converter) < 0)
+    Mix_Chunk *chunk = convert_audio(source_buffer, source_length,
+                                     source_spec.format, source_spec.channels, source_spec.freq);
+    SDL_FreeWAV(source_buffer);
+    return chunk;
+}
+
+Mix_Chunk *Mix_LoadRAW(const Uint8 *source, size_t source_length)
+{
+    // Keep Bedlam's unsigned 8-bit mono samples at their original rate. The
+    // mixer resamples them while playing, avoiding a 16x permanent expansion
+    // into 44100 Hz stereo S16 buffers for every loaded effect.
+    if (!source || source_length == 0 || source_length > UINT32_MAX)
     {
-        SDL_FreeWAV(source_buffer);
-        if (converter)
-        {
-            SDL_FreeAudioStream(converter);
-        }
+        SDL_SetError("Invalid raw audio source buffer");
         return nullptr;
     }
 
-    const int available = SDL_AudioStreamAvailable(converter);
-    if (available < 4)
-    {
-        SDL_FreeWAV(source_buffer);
-        SDL_FreeAudioStream(converter);
-        SDL_SetError("WAV contains no converted audio samples");
-        return nullptr;
-    }
-
-    const Uint32 length = static_cast<Uint32>(available - (available % 4));
     Mix_Chunk *chunk = static_cast<Mix_Chunk *>(SDL_malloc(sizeof(Mix_Chunk)));
-    Uint8 *buffer = static_cast<Uint8 *>(SDL_malloc(length));
+    Uint8 *buffer = static_cast<Uint8 *>(SDL_malloc(source_length));
     if (!chunk || !buffer)
     {
         SDL_free(chunk);
         SDL_free(buffer);
-        SDL_FreeWAV(source_buffer);
-        SDL_FreeAudioStream(converter);
-        SDL_SetError("Out of memory loading WAV chunk");
+        SDL_SetError("Out of memory loading raw audio chunk");
         return nullptr;
     }
 
-    const int received = SDL_AudioStreamGet(converter, buffer, static_cast<int>(length));
-    SDL_FreeWAV(source_buffer);
-    SDL_FreeAudioStream(converter);
-    if (received != static_cast<int>(length))
-    {
-        SDL_free(buffer);
-        SDL_free(chunk);
-        SDL_SetError("Unable to convert complete WAV chunk");
-        return nullptr;
-    }
-
+    std::memcpy(buffer, source, source_length);
     chunk->allocated = 1;
     chunk->abuf = buffer;
-    chunk->alen = length;
+    chunk->alen = static_cast<Uint32>(source_length);
     chunk->volume = MIX_MAX_VOLUME;
+    chunk->format = AUDIO_U8;
+    chunk->channels = 1;
+    chunk->frequency = 11025;
     return chunk;
 }
 
@@ -381,7 +471,7 @@ int Mix_SetPanning(int channel, Uint8 left, Uint8 right)
 
 int Mix_PlayChannel(int channel, Mix_Chunk *chunk, int loops)
 {
-    if (!chunk || !chunk->abuf || chunk->alen < 4)
+    if (!chunk || !chunk->abuf || chunk->alen == 0)
     {
         return -1;
     }
@@ -401,7 +491,7 @@ int Mix_PlayChannel(int channel, Mix_Chunk *chunk, int loops)
     }
     Channel &item = g_mixer.channels[static_cast<size_t>(channel)];
     item.chunk = chunk;
-    item.position = 0;
+    item.source_phase = 0;
     item.loops_remaining = loops;
     item.fade_total = 0;
     item.fade_remaining = 0;
